@@ -1,0 +1,41 @@
+import { useEffect, useState } from "react";
+import "./App.css";
+import fetchProducts from "./services/api";
+import ProductCard from "./components/ProductCard";
+
+function App() {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    try {
+      fetchProducts().then((data) => setProducts(data));
+    } catch (err) {
+      console.log(err);
+      setError(err);
+    } finally {
+      console.log("loaded");
+    }
+  }, []);
+
+  return (
+    <>
+      <div className="navbar">
+        <div className="nav-logo">InstiStore</div>
+        <div className="nav-links">
+          <p>Home</p>
+          <p>Products</p>
+          <p>About</p>
+          <p>Contact</p>
+        </div>
+      </div>
+      <div className="page-formatting">
+        {products.map((product) => (
+          <ProductCard product={product} key={product.id} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default App;
