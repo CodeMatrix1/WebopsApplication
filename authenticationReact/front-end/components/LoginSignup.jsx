@@ -5,45 +5,69 @@ function LoginSignup({ res, setres }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formdata = new FormData(e.target);
-    const name = formdata.get("name");
-    const password = formdata.get("password");
+
+    const fields =
+      authenvar === "Signup"
+        ? {
+            name: formdata.get("name"),
+            email: formdata.get("email"),
+            password: formdata.get("password"),
+          }
+        : {
+            email: formdata.get("email"),
+            password: formdata.get("password"),
+          };
 
     try {
-      // Fixed URL: Use HTTP (not HTTPS) and correct port (5000 instead of 5173)
       const response = await fetch(
-        `http://localhost:5000/${authenvar.toLowerCase()}`, // Changed to lowercase
+        `http://localhost:5000/${authenvar.toLowerCase()}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, password }),
+          body: JSON.stringify(fields),
         }
       );
-
       const data = await response.json();
-      setres(data.msg);
 
-      // Only switch to Signup after successful Login
-      if (response.ok && data.switch_to) {
+      if (data.msg === "yes") {
+        setres({
+          msg: data.msg,
+          username: data.username || "",
+          database: data.database,
+        });
+      } else if (response.ok && data.switch_to) {
         setauthenvar(data.switch_to);
       }
     } catch (err) {
-      console.log(err);
-      setres("Connection error");
+      setres({ msg: "Connection error", username: "" });
     }
     e.target.reset();
   };
+
   return (
     <div className="container">
       <h2>{authenvar}</h2>
-      {/* Moved onSubmit to FORM (was on button) */}
       <form className="form-container" onSubmit={handleSubmit}>
+        {authenvar === "Signup" ? (
+          <div className="input-element">
+            <label htmlFor="name">Username</label>
+            <input
+              name="name"
+              id="username"
+              type="text"
+              placeholder="Enter username"
+              className="input"
+              required
+            />
+          </div>
+        ) : null}
         <div className="input-element">
-          <label htmlFor="name">Username</label>
+          <label htmlFor="password">Email:</label>
           <input
-            name="name"
-            id="username"
-            type="text"
-            placeholder="Enter username"
+            name="email"
+            id="email"
+            type="email"
+            placeholder="Enter email"
             className="input"
             required
           />
@@ -55,7 +79,7 @@ function LoginSignup({ res, setres }) {
             id="password"
             type="password"
             placeholder="Enter password"
-            className="password"
+            className="input"
             required
           />
         </div>
@@ -81,7 +105,7 @@ function LoginSignup({ res, setres }) {
         </>
       )}
 
-      {res && <p>{res}</p>}
+      {res.msg && <p>{res.msg}</p>}
     </div>
   );
 }
