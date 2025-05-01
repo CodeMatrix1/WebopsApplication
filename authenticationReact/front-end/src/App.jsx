@@ -29,7 +29,7 @@ function App() {
             <div className="nav-logo">InstiStore</div>
             <div className="nav-links">
               <p>Home</p>
-              <p>Admin</p>
+              <p>AProducts</p>
               <p>About</p>
               <p>Contact</p>
             </div>
